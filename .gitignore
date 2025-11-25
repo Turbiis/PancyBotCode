@@ -8,3 +8,13 @@ package-lock.json
 yarn.lock
 yarn-error.log
 logs/
+
+# Go build artifacts
+go-systems/bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
