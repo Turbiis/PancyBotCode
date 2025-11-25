@@ -200,7 +200,9 @@ func (c *Communicator) On(requestTopic string, handler RequestHandler) error {
 			response = Response{CorrelationID: request.CorrelationID, Error: "failed to marshal response"}
 			responseData, _ = json.Marshal(response)
 		}
-		c.client.Publish(responseTopic, 0, false, responseData)
+		if token := c.client.Publish(responseTopic, 0, false, responseData); token.Wait() && token.Error() != nil {
+			fmt.Printf("[MQTT] Failed to publish response: %v\n", token.Error())
+		}
 	}
 
 	if token := c.client.Subscribe(topic, 0, messageHandler); token.Wait() && token.Error() != nil {
@@ -215,23 +217,25 @@ func (c *Communicator) topicMatches(pattern, topic string) bool {
 	patternParts := strings.Split(pattern, "/")
 	topicParts := strings.Split(topic, "/")
 
-	if len(patternParts) != len(topicParts) {
-		return false
-	}
-
 	for i, part := range patternParts {
+		if part == "#" {
+			// # matches everything from this point on
+			return true
+		}
+		if i >= len(topicParts) {
+			// Pattern has more parts than topic
+			return false
+		}
 		if part == "+" {
 			continue // + matches any single level
-		}
-		if part == "#" {
-			return true // # matches everything after
 		}
 		if part != topicParts[i] {
 			return false
 		}
 	}
 
-	return true
+	// All pattern parts matched; ensure topic doesn't have extra parts
+	return len(patternParts) == len(topicParts)
 }
 
 // Destroy closes the MQTT connection gracefully.

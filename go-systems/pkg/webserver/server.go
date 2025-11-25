@@ -250,7 +250,12 @@ func (wc *webhookClient) logRequest(r *http.Request, status int, duration time.D
 		return
 	}
 	req.Header.Set("Content-Type", "application/json")
-	wc.client.Do(req)
+	resp, err := wc.client.Do(req)
+	if err != nil {
+		fmt.Printf("[WEBHOOK] Failed to send log request: %v\n", err)
+		return
+	}
+	defer resp.Body.Close()
 }
 
 func (wc *webhookClient) logSuspicious(r *http.Request) {
@@ -274,7 +279,12 @@ func (wc *webhookClient) logSuspicious(r *http.Request) {
 		return
 	}
 	req.Header.Set("Content-Type", "application/json")
-	wc.client.Do(req)
+	resp, err := wc.client.Do(req)
+	if err != nil {
+		fmt.Printf("[WEBHOOK] Failed to send suspicious request: %v\n", err)
+		return
+	}
+	defer resp.Body.Close()
 }
 
 // RateLimiterConfig configures the rate limiter.
