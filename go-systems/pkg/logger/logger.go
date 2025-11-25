@@ -36,6 +36,29 @@ const (
 	SystemLevel
 )
 
+// ANSI color constants for terminal output
+const (
+	colorReset   = "\033[0m"
+	colorBoldRed = "\033[1;31m"
+	colorRed     = "\033[31m"
+	colorYellow  = "\033[33m"
+	colorGreen   = "\033[32m"
+	colorCyan    = "\033[36m"
+	colorMagenta = "\033[35m"
+	colorBlue    = "\033[34m"
+)
+
+// Discord embed color constants
+const (
+	discordColorRed    = 0xFF0000
+	discordColorYellow = 0xFFFF00
+	discordColorGreen  = 0x00FF00
+	discordColorBlue   = 0x0000FF
+	discordColorPurple = 0x800080
+	discordColorGrey   = 0x808080
+	discordColorBlack  = 0x000000
+)
+
 // String returns the string representation of the log level.
 func (l Level) String() string {
 	switch l {
@@ -62,21 +85,21 @@ func (l Level) String() string {
 func (l Level) Color() string {
 	switch l {
 	case CriticalLevel:
-		return "\033[1;31m" // Bold Red
+		return colorBoldRed
 	case ErrorLevel:
-		return "\033[31m" // Red
+		return colorRed
 	case WarnLevel:
-		return "\033[33m" // Yellow
+		return colorYellow
 	case SuccessLevel:
-		return "\033[32m" // Green
+		return colorGreen
 	case InfoLevel:
-		return "\033[36m" // Cyan
+		return colorCyan
 	case DebugLevel:
-		return "\033[35m" // Magenta
+		return colorMagenta
 	case SystemLevel:
-		return "\033[34m" // Blue
+		return colorBlue
 	default:
-		return "\033[0m" // Reset
+		return colorReset
 	}
 }
 
@@ -84,19 +107,19 @@ func (l Level) Color() string {
 func (l Level) DiscordColor() int {
 	switch l {
 	case CriticalLevel, ErrorLevel:
-		return 0xFF0000 // Red
+		return discordColorRed
 	case WarnLevel:
-		return 0xFFFF00 // Yellow
+		return discordColorYellow
 	case SuccessLevel:
-		return 0x00FF00 // Green
+		return discordColorGreen
 	case InfoLevel:
-		return 0x0000FF // Blue
+		return discordColorBlue
 	case DebugLevel:
-		return 0x800080 // Purple
+		return discordColorPurple
 	case SystemLevel:
-		return 0x808080 // Grey
+		return discordColorGrey
 	default:
-		return 0x000000 // Default
+		return discordColorBlack
 	}
 }
 
@@ -180,12 +203,11 @@ func (l *Logger) log(level Level, message string, prefix string) {
 	timestamp := time.Now().Format("2006-01-02 15:04:05")
 
 	// Console output with colors
-	reset := "\033[0m"
 	fmt.Printf("[%s] [%s%s%s] [%s]: %s\n",
 		timestamp,
 		level.Color(),
 		level.String(),
-		reset,
+		colorReset,
 		prefix,
 		message,
 	)

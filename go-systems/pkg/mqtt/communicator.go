@@ -194,7 +194,12 @@ func (c *Communicator) On(requestTopic string, handler RequestHandler) error {
 		}
 
 		// Publish response
-		responseData, _ := json.Marshal(response)
+		responseData, err := json.Marshal(response)
+		if err != nil {
+			// Log error but don't fail - send empty response
+			response = Response{CorrelationID: request.CorrelationID, Error: "failed to marshal response"}
+			responseData, _ = json.Marshal(response)
+		}
 		c.client.Publish(responseTopic, 0, false, responseData)
 	}
 

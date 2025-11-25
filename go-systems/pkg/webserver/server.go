@@ -238,9 +238,17 @@ func (wc *webhookClient) logRequest(r *http.Request, status int, duration time.D
 	}
 
 	msg := DiscordMessage{Embeds: []DiscordEmbed{embed}}
-	data, _ := json.Marshal(msg)
+	data, err := json.Marshal(msg)
+	if err != nil {
+		fmt.Printf("[WEBHOOK] Failed to marshal log request: %v\n", err)
+		return
+	}
 
-	req, _ := http.NewRequest("POST", wc.url, bytes.NewBuffer(data))
+	req, err := http.NewRequest("POST", wc.url, bytes.NewBuffer(data))
+	if err != nil {
+		fmt.Printf("[WEBHOOK] Failed to create log request: %v\n", err)
+		return
+	}
 	req.Header.Set("Content-Type", "application/json")
 	wc.client.Do(req)
 }
@@ -254,9 +262,17 @@ func (wc *webhookClient) logSuspicious(r *http.Request) {
 	}
 
 	msg := DiscordMessage{Embeds: []DiscordEmbed{embed}}
-	data, _ := json.Marshal(msg)
+	data, err := json.Marshal(msg)
+	if err != nil {
+		fmt.Printf("[WEBHOOK] Failed to marshal suspicious request: %v\n", err)
+		return
+	}
 
-	req, _ := http.NewRequest("POST", wc.url, bytes.NewBuffer(data))
+	req, err := http.NewRequest("POST", wc.url, bytes.NewBuffer(data))
+	if err != nil {
+		fmt.Printf("[WEBHOOK] Failed to create suspicious request: %v\n", err)
+		return
+	}
 	req.Header.Set("Content-Type", "application/json")
 	wc.client.Do(req)
 }

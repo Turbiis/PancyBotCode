@@ -73,7 +73,11 @@ func (dm *DataManager) generateCacheKey(query bson.M) string {
 		sortedQuery[k] = query[k]
 	}
 
-	data, _ := json.Marshal(sortedQuery)
+	data, err := json.Marshal(sortedQuery)
+	if err != nil {
+		// Fallback to a simpler key format if JSON marshal fails
+		return fmt.Sprintf("%s:%v", dm.collectionName, query)
+	}
 	return fmt.Sprintf("%s:%s", dm.collectionName, string(data))
 }
 
